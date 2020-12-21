@@ -16,6 +16,22 @@
     width: 50%;
     margin: 0.5em;
   }
+
+
+.react-calendar {
+  width: auto !important;
+  height: auto !important;
+}
+
+.loading-spinner {
+  width: 100px;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: block !important;
+  margin-top: 25vh;
+
+}
+
   .react-calendar,
   .react-calendar *,
   .react-calendar *:before,

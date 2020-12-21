@@ -1,15 +1,17 @@
-import React, { useState, useRef } from 'react'
-import { Container, Row, Col, Button, Navbar, Form, FormControl, Nav } from 'react-bootstrap'
+import React, { useState, useEffect } from 'react'
+import { Container, Row, Col, Button, Spinner } from 'react-bootstrap'
 import Calendar from 'react-calendar'
 import './Calendar.css'
 import { EventInfo } from '../eventInfo/EventInfo'
+import axios from 'axios'
+import { getCookie, setCookie } from '../../utils/utils'
 
 
 const getCurrentEvents = (date, events) => {
   return events.filter(e => {
-    const currDate = new Date(e.start.getTime())
+    const currDate = new Date(e.start)
     currDate.setHours(0,0,0,0)
-    return (e.start <= date && e.end >= date) || currDate.getTime() === date.getTime()
+    return (currDate <= date && new Date(e.end) >= date) || currDate.getTime() === date.getTime()
   })
 }
 
@@ -23,30 +25,48 @@ const renderEvents = (setCurrentEvent, currentEvent, events) => ({ activeStartDa
   ))
 }
 
-export const Main = ({events}) => {
+export const Main = () => {
   const [value, onChange] = useState(new Date())
   const [displayedEvents, setDisplayedEvents] = useState([])
+  const [events, setEvents] = useState([])
+  const [eventsLoaded, setEventsLoaded] = useState(false)
+  const [clickedMonth, onClickedMonth] = useState()
 
+  useEffect(() => {
+    console.log(value.getMonth())
+    const authToken = getCookie('auth-token')
+    const month = value.getMonth()
+    const year = value.getFullYear()
+    axios.post('http://localhost:5000/events/getByMonth', {
+      month,
+      year
+    }, {
+      headers: {
+        'auth-token': authToken
+      }
+    })
+    .then((res) => {
+      console.log(res)
+      setEventsLoaded(true)
+      setEvents(res.data.data.events)
+    })
+    .catch(error => console.log(error))
+  }, [clickedMonth])
 
+  if (!eventsLoaded) {
+    return (
+      <Spinner animation="border" role="status" variant="info" className="loading-spinner">
+        <span className="sr-only">Loading...</span>
+      </Spinner>
+    )
+  }
 
   return (
     <Container>
-      <Navbar variant="light">
-        <Nav className="mr-auto">
-          <Button variant="outline-info">+ Create Event</Button>
-        </Nav>
-        <Form inline className="mr-auto">
-          <FormControl type="text" placeholder="Search" className="mr-sm-2" />
-          <Button variant="outline-info">Search</Button>
-        </Form>
-        <Nav >
-        <Button variant="outline-info">Sign In</Button>
-        </Nav>
-
-      </Navbar>
       <Row>
         <Col md={12}>
           <Calendar
+            onActiveStartDateChange={onClickedMonth}
             onChange={onChange}
             value={value}
             tileContent={renderEvents(setDisplayedEvents, displayedEvents, events)}
@@ -59,10 +79,10 @@ export const Main = ({events}) => {
         </Col>
       </Row>
       {
-        [...displayedEvents].sort((a,b) => (a.start.getTime() - b.start.getTime())).map((event) => (
+        [...displayedEvents].sort((a,b) => (new Date(a.start).getTime() - new Date(b.start).getTime())).map((event) => (
           <Row>
             <Col>
-              <EventInfo {...event} />
+              <EventInfo {...event} key={event._id} />
             </Col>
           </Row>
         ))
