@@ -1,31 +1,26 @@
-// middleware to validate token
-const axios = require('axios')
+const jwt = require('jsonwebtoken')
+
 const validateAuth = (req, res, next) => {
-  console.log('req.body in middleware: ', req.body)
-  const token = req.header("Authorization")
-  if (!token) return res.status(401).json({ error: "Access denied" })
-  try {
-    axios.get('https://app.staging.fiddlequest.com/api/me', {
-      headers: {
-        Authorization: 'Bearer ' + token
-      }
+  const token = req.header('auth-token')
+
+  if (!token) {
+    return res.status(401).json({
+      error: "Access denied"
     })
-    .then((result) => {
-      if (!result || !(result && result.data) || !(result && result.data && result.data._id || result.status !== 200)) {
-        console.log('not authorized')
-        res.status(400).json({ error: "Token is not valid 1" })
-      } else {
-        next() // to continue the flow
-      }
-    })
-    .catch((err) => {
-      console.log('err: ', err)
-    res.status(400).json({ error: "Token is not valid 2" })
-    })
-  } catch (err) {
-    console.log('err: ', err)
-    res.status(400).json({ error: "Token is not valid 3" })
   }
+
+  try {
+    const verified = jwt.verify(token, process.env.TOKEN_SECRET || 'TEST')
+    req.user = verified
+    if (verified) {
+      next()
+    } else {
+      res.status(401).json({ error: 'Acess denied' })
+    }
+  } catch (error) {
+    res.status(401).json({ error: 'Token is not valid' })
+  }
+
 }
 
 module.exports = validateAuth

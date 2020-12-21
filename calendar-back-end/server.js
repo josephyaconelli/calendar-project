@@ -1,6 +1,8 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const path = require('path')
+const cors = require('cors')
+
 
 const mongoose = require('mongoose')
 const LOCAL_DB = 'mongodb://127.0.0.1:27017/calendar-project'
@@ -22,6 +24,9 @@ db.once('open', () => {
 
 const app = express()
 const port = process.env.PORT || 5000
+app.use(cors())
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
 
 // app.use('/', express.static(path.join(__dirname + '/dist')))
 
@@ -37,11 +42,12 @@ app.use(bodyParser.urlencoded({ extended: true }))
 const validateAuth = require("./middleware/validateAuth")
 
 const authRoutes = require("./routes/auth")
-app.use("/api/auth", authRoutes)
+const eventsRouthes = require("./routes/events")
+const shareRoutes = require("./routes/share")
 
-app.post("/api/auth/validate", validateAuth, (req, res) => {
-  res.status(200).json({ validated: true })
-})
+app.use("/auth", authRoutes)
+app.use("/events", validateAuth, eventsRouthes)
+app.use("/share", shareRoutes)
 
 
 app.listen(port, () => console.log(`Listening on port ${port}`))
