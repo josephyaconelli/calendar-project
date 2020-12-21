@@ -5,9 +5,11 @@ const cors = require('cors')
 
 
 const mongoose = require('mongoose')
-const LOCAL_DB = 'mongodb://127.0.0.1:27017/calendar-project'
+
+const DB = "mongodb+srv://test:pass@cluster0.7zw4v.mongodb.net/calendar-project?retryWrites=true&w=majority"
+
 mongoose.connect(
-    process.env.MONGODB_URI || LOCAL_DB,
+    DB || process.env.MONGODB_URI || LOCAL_DB,
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
