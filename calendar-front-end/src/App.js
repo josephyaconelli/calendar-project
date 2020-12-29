@@ -6,12 +6,12 @@ import {
   Switch,
   Route
 } from 'react-router-dom'
-import { Main } from './components/calendar/Calendar'
-import { CreateEvent } from './components/createEvent/CreateEvent'
-import { Header } from './components/Header/Header'
-import { Login } from './components/login/Login'
+import CalendarContainer from './components/calendar/CalendarContainer'
+import CreateEventContainer from './components/createEvent/CreateEventContainer'
+import HeaderContainer from './components/Header/HeaderContainer'
+import LoginContainer from './components/login/LoginContainer'
 import { Register } from './components/register/Register'
-import { SearchResults } from './components/searchResults/SearchResults'
+import SearchResultsContainer from './components/searchResults/SearchResultsContainer'
 import { getCookie, setCookie } from './utils/utils'
 
 const myEvent4 = {
@@ -39,15 +39,15 @@ function App() {
         crossOrigin="anonymous"
         />
       <Router>
-        <Header loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
+        <HeaderContainer />
 
         <Switch>
           <Route path='/search'>
-            <SearchResults loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
+            <SearchResultsContainer />
           </Route>
 
           <Route path='/login'>
-            <Login loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
+            <LoginContainer />
           </Route>
 
           <Route path='/register'>
@@ -55,12 +55,11 @@ function App() {
           </Route>
 
           <Route path='/edit'>
-            <CreateEvent loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
+            <CreateEventContainer />
           </Route>
 
-
           <Route path ='/'>
-            <Main />
+            <CalendarContainer />
           </Route>
 
         </Switch>

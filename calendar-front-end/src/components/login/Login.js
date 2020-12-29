@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Container, Button, Jumbotron, Form, FormControl, FormGroup, FormLabel } from 'react-bootstrap'
-import axios from 'axios'
+import { Container, Button, Jumbotron, Form, FormControl, FormGroup, FormLabel, Alert } from 'react-bootstrap'
 import { Link, useHistory } from 'react-router-dom'
 import { setCookie } from '../../utils/utils'
 
@@ -8,25 +7,20 @@ import { setCookie } from '../../utils/utils'
 
 
 
-export const Login = ({ setLoggedIn }) => {
+export const Login = ({ isLoggedIn, isError, error, logIn }) => {
 
   const [email, setEmail] = useState('')
   const [password, setPasssword] = useState('')
 
   const history = useHistory()
 
-  const tryLogin = (email, password) => {
-    axios.post('http://localhost:5000/auth/login', {
-      email,
-      password
-    })
-    .then((res) => {
-      setCookie("auth-token", res.data.data.token)
-      setCookie("refresh-token", res.data.data.refreshToken)
-      setLoggedIn(true)
+  useEffect(() => {
+    if (isLoggedIn) {
       history.push('/')
-    })
-  }
+    }
+  }, [isLoggedIn])
+
+
 
   return (
     <Container>
@@ -40,7 +34,10 @@ export const Login = ({ setLoggedIn }) => {
             <FormLabel>Password</FormLabel>
             <FormControl type="password" placeholder="password" className="mr-sm-2" value={password} onChange={e => setPasssword(e.target.value)} />
           </FormGroup>
-          <Button onClick={() => tryLogin(email, password)} variant="info">Log In</Button>
+          {isError && (<Alert variant="danger">
+            {error}
+          </Alert>)}
+          <Button onClick={() => logIn(email, password)} variant="info">Log In</Button>
           <hr />
           <Link to="/register">Create account</Link>
         </Form>

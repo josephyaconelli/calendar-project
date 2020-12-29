@@ -21,14 +21,14 @@ router.post('/login', async (req, res) => {
   // check if user already exists
   const user = await User.findOne({ email: email })
   if (!user) {
-    return res.status(500).json({ error: 'No account found' })
+    return res.status(500).json({ error: 'Email and password don\'t match' })
   }
 
   // compare password
   const passwordMatches = await bcrypt.compare(password, user.password)
 
   if (!passwordMatches) {
-    return res.status(500).json({ error: 'Incorrect password' })
+    return res.status(500).json({ error: 'Email and password don\'t match' })
   }
 
   const token = jwt.sign(

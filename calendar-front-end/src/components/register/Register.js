@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Container, Button, Jumbotron, Form, FormControl, FormGroup, FormLabel } from 'react-bootstrap'
-import axios from 'axios'
 import { Link, useHistory } from 'react-router-dom'
+import axios from 'axios'
 import { setCookie } from '../../utils/utils'
-
-
-
 
 
 export const Register = ({setLoggedIn}) => {
@@ -19,7 +16,6 @@ export const Register = ({setLoggedIn}) => {
 
 
   const tryRegister = (name, email, password) => {
-    console.log('trying now')
     axios.post('http://localhost:5000/auth/register', {
       email,
       password,

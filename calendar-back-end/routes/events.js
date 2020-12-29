@@ -90,8 +90,6 @@ router.post('/edit', async (req, res) => {
 
     const filtConflits = conflicts.filter(c => String(c._id) !== id)
     if (filtConflits.length > 0) {
-      console.log(filtConflits)
-      console.log(id)
       return res.status(299).json({
         error: 'Conflicting events',
         events: filtConflits
@@ -137,10 +135,7 @@ router.post('/remove', async (req, res) => {
 router.post('/getByMonth', async (req, res) => {
   const { month, year } = req.body
   const { id } = req.user
-  console.log('month: ', month, ' year: ', year)
-  console.log('id: ', id)
   try {
-    console.log('hello')
     const events = await Event.find({
       ownerId: id,
       $or: [
@@ -148,11 +143,9 @@ router.post('/getByMonth', async (req, res) => {
         {end:  { $lt: new Date(String((month >= 11 ? year + 1 : year))+','+ String((month % 12 + 1))), $gte: new Date(year+','+month) }}
       ]
     })
-    console.log('events: ', events)
     return res.json({error: null, data: { events }})
 
   } catch (error) {
-    console.log('error:', error)
     return res.status(500).json(error)
   }
 
@@ -172,7 +165,6 @@ router.post('/search', async (req, res) => {
           $caseSensitive: true
         }
       })
-    console.log("events: ", events)
     return res.json({ error: null, data: { events }})
   } catch (error) {
     return res.status(500).json({error: error})
@@ -184,11 +176,8 @@ router.post('/search', async (req, res) => {
 router.post('/share', async (req, res) => {
   const { eventId, setShare } = req.body
   const { id } = req.user
-  console.log('setsahre: ', setShare)
-
   try {
     const event = await Event.findOneAndUpdate({ _id: eventId, ownerId: id}, { public: setShare }, { new: true })
-    console.log('event: ', event)
     return res.json({
       error: null,
       eventId: eventId

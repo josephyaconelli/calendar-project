@@ -1,20 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { Navbar, Button, Form, Container, Nav, FormControl } from 'react-bootstrap'
 import { Link, useHistory } from 'react-router-dom'
-import { deleteCookie, setCookie } from '../../utils/utils'
 
 
-export const Header = ({ loggedIn, setLoggedIn }) => {
+export const Header = ({ isLoggedIn, logOut }) => {
   
   const [searchText, setSearchText] = useState('')
   const history = useHistory()
-
-  const logOut = () => {
-    deleteCookie('refresh-token')
-    deleteCookie('auth-token')
-    setLoggedIn(false)
-    history.push('/login')
-  }
+  
 
 
   return (
@@ -23,12 +16,15 @@ export const Header = ({ loggedIn, setLoggedIn }) => {
         <Nav className="mr-auto">
           <Link to="/edit"><Button variant="outline-info">+ Create Event</Button></Link>
         </Nav>
-        <Form inline className="mr-auto">
+        <Form inline className="mr-auto" onSubmit={(e) => {
+          e.preventDefault()
+          history.push(`/search?q=${searchText}`)
+          }}>
           <FormControl type="text" placeholder="Search" className="mr-sm-2" value={searchText} onChange={e => setSearchText(e.target.value)} />
-          <Button variant="outline-info" href={`/search?q=${searchText}`}>Search</Button>
+          <Button variant="outline-info" type="submit">Search</Button>
         </Form>
         <Nav >
-        { !loggedIn ? (
+        { !isLoggedIn ? (
           <Link to="/login"><Button variant="outline-info">Log In</Button></Link>
         ) : (
           <Button variant="outline-info" onClick={logOut}>Log Out</Button>

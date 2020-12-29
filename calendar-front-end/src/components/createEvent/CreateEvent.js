@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react'
-import { Link, useHistory, useLocation } from 'react-router-dom'
-import axios from 'axios'
-import { Container, Button, Form, FormGroup, FormControl, FormLabel, Alert} from 'react-bootstrap'
+import { useHistory, useLocation } from 'react-router-dom'
+import { Container, Button, Form, FormGroup, FormControl, FormLabel, Alert } from 'react-bootstrap'
 import DateTimePicker from 'react-datetime-picker'
-import { getCookie } from '../../utils/utils'
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
 }
 
-export const CreateEvent = () => {
+export const CreateEvent = ({
+  isLoggedIn,
+  isError,
+  wasSuccessful,
+  error,
+  addEvent,
+  editEvent,
+  events
+}) => {
 
   let query = useQuery()
 
@@ -27,75 +33,35 @@ export const CreateEvent = () => {
   const [end, setEnd] = useState(oldEnd || new Date(Date.now() + 60*60*1000))
   const [busy, setBusy] = useState(oldBusy || true)
   const [publiclyAvailable, setPubliclyAvailable] = useState(oldPublic || false)
-  const [errorMessage, setErrorMessage] = useState('')
   const history = useHistory()
 
-  const tryAddEvent = () => {
-    const authToken = getCookie('auth-token')
-
-    axios.post('http://localhost:5000/events/add', {
-      title: title,
-      description: description,
-      start: start,
-      end: end,
-      busy: busy,
-      public: publiclyAvailable
-    }, {
-      headers: {
-        "auth-token": authToken 
-      }
-    })
-    .then((res) => {
-
-      if(res.status === 299) {
-        const conflicts = res.data.events.map(e => e.title)
-        setErrorMessage(`${res.data.error}. Events: ${conflicts}`)
-      } else {
-        history.push('/')
-      }
-    })
-    .catch((error) => {
-      console.log('error: ', error)
-      console.log('status: ', error.status)
-    })
-
-  }
-
-  const tryEditEvent = () => {
-    const authToken = getCookie('auth-token')
-
-    axios.post('http://localhost:5000/events/edit', {
-      id: id,
-      toUpdate: {
-        title: title,
-        description: description,
-        start: start,
-        end: end,
-        busy: busy,
-        public: publiclyAvailable
-      }
-    }, {
-      headers: {
-        "auth-token": authToken 
-      }
-    })
-    .then((res) => {
-
-      if(res.status === 299) {
-        const conflicts = res.data.events.map(e => e.title)
-        setErrorMessage(`${res.data.error}. Events: ${conflicts}`)
-      } else {
-        history.push('/')
-      }
-    })
-    .catch((error) => {
-      console.log('status: ', error)
-    })
-  }
+  useEffect(() => {
+    const currEvent = (events || []).filter(({_id}) => _id === id)[0]
+    let changed = false
+    if (currEvent) {
+      changed = (
+        oldTitle !== currEvent.title
+        || oldDescription !== currEvent.description
+        || oldStart.getSeconds() !== new Date(currEvent.start).getSeconds()
+        || oldEnd.getSeconds() !== new Date(currEvent.end).getSeconds()
+        || oldBusy !== currEvent.busy
+        || oldPublic !== currEvent.public
+      )
+    }
+    
+    if(wasSuccessful || (changed && events.length >= 1)) {
+      history.push('/')
+    }
+  }, [wasSuccessful, events])
 
   return (
     <Container>
+
       <Form className="mr-auto">
+      <hr />
+      <Button onClick={() => history.push('/')} variant="outline-info">{'<'} Back</Button>
+      <br/>
+      <br/>
         <FormGroup controlId="formTitle">
           <FormLabel>Title</FormLabel>
           <FormControl type="text" placeholder="" className="mr-sm-2" value={title} onChange={e => setTitle(e.target.value)}  />
@@ -107,10 +73,25 @@ export const CreateEvent = () => {
         <DateTimePicker value={start} onChange={setStart} />
         <DateTimePicker value={end} onChange={setEnd} />
         <br/><br/>
-        <Button onClick={() => id ? tryEditEvent() : tryAddEvent()} variant="info">{id ? 'Save' : 'Create'}</Button>
+        <Button onClick={() => id ? editEvent(
+          id,
+          {title,
+          description,
+          start,
+          end,
+          busy,
+          public: publiclyAvailable}
+        ) : addEvent(
+          title,
+          description,
+          start,
+          end,
+          busy,
+          publiclyAvailable
+        )} variant="info">{id ? 'Save' : 'Create'}</Button>
       </Form>
       <br/>
-      {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
+      {isError && <Alert variant="danger">{error}</Alert>}
     </Container>
   )
 }

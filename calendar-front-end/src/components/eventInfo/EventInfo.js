@@ -1,8 +1,6 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import {Card, Button} from 'react-bootstrap'
 import { Link, useHistory} from 'react-router-dom'
-import axios from 'axios'
-import { getCookie } from '../../utils/utils'
 
 
 
@@ -33,44 +31,19 @@ const createTimeString = (start, end) => {
 
 
 
-export const EventInfo = ({title, start, end, description, _id, busy, ...restOfIt}) => {
+export const EventInfo = ({
+  title,
+  start,
+  end,
+  description,
+  _id,
+  busy,
+  removeEvent,
+  shareEvent,
+  unshareEvent,
+  ...restOfIt}) => {
   
   let history = useHistory()
-
-  const deleteEvent = (id) => {
-    const authToken = getCookie('auth-token')
-    console.log('auth:', authToken)
-    axios.post('http://localhost:5000/events/remove', {
-      id: id
-    }, {
-      headers: {
-        "auth-token": authToken
-      }
-    }).then(res => {
-      history.go(0)
-    })
-    .catch(err => console.log(err))
-  }
-
-  const shareEvent = (id, setShare) => {
-    const authToken = getCookie('auth-token')
-    console.log(restOfIt)
-    console.log('id:', id)
-    axios.post('http://localhost:5000/events/edit', {
-      id: id,
-      toUpdate: {
-        public: setShare
-      }
-    }, {
-      headers: {
-        "auth-token": authToken
-      }
-    }).then(res => {
-      history.go(0)
-    })
-    .catch(err => console.log(err))
-  }
-  
 
   return (
     <Card>
@@ -79,7 +52,6 @@ export const EventInfo = ({title, start, end, description, _id, busy, ...restOfI
         <Card.Subtitle className="mb-2 text-muted">{
           createTimeString(start, end)
         }</Card.Subtitle>
-        <Card.Text>
           {description}
           {restOfIt["public"] && (
             <>
@@ -88,12 +60,11 @@ export const EventInfo = ({title, start, end, description, _id, busy, ...restOfI
             </>
           )}
           
-        </Card.Text>
       </Card.Body>
       <Card.Footer>
         <Link to={`/edit?id=${_id}&title=${title}&description=${description}&start=${start}&end=${end}&busy=${busy}`}><Button variant="info">Edit</Button></Link>
-        &nbsp;<Button variant="info"  onClick={() => shareEvent(_id, !restOfIt["public"])}>{restOfIt["public"] ? 'Unshare' : 'Share'}</Button>
-        &nbsp;<Button variant="warning"  onClick={() => deleteEvent(_id)}>Delete</Button>
+        &nbsp;<Button variant="info"  onClick={() => restOfIt["public"] ? unshareEvent(_id) : shareEvent(_id)}>{restOfIt["public"] ? 'Unshare' : 'Share'}</Button>
+        &nbsp;<Button variant="warning"  onClick={() => removeEvent(_id)}>Delete</Button>
       </Card.Footer>
     </Card>
     
