@@ -6,10 +6,10 @@ const cors = require('cors')
 
 const mongoose = require('mongoose')
 
-const DB = "mongodb+srv://test:pass@cluster0.7zw4v.mongodb.net/calendar-project?retryWrites=true&w=majority"
+const TEST_DB = "mongodb+srv://test:pass@cluster0.7zw4v.mongodb.net/calendar-project?retryWrites=true&w=majority"
 
 mongoose.connect(
-    DB || process.env.MONGODB_URI || LOCAL_DB,
+    process.env.MONGODB_URI || TEST_DB,
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,

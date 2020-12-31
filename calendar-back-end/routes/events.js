@@ -136,16 +136,25 @@ router.post('/getByMonth', async (req, res) => {
   const { month, year } = req.body
   const { id } = req.user
   try {
+
+    const monthStart = new Date(String(year)+','+ String(month + 1))
+    const monthEnd = new Date(String((month + 1 >= 12 ? year + 1 : year))+','+ String((month + 2) % 12 === 0 ? 12 : (month + 2) % 12))
+
     const events = await Event.find({
       ownerId: id,
       $or: [
-        {start:  { $lt: new Date(String((month >= 11 ? year + 1 : year))+','+ String((month % 12 + 1))), $gte: new Date(year+','+month) }},
-        {end:  { $lt: new Date(String((month >= 11 ? year + 1 : year))+','+ String((month % 12 + 1))), $gte: new Date(year+','+month) }}
+        { start: { $lte: monthEnd, $gte: monthStart }},
+        { end: { $lte: monthEnd, $gte: monthStart }},
+        { $and: [
+          { start: { $lte: monthStart }},
+          { end: { $gte: monthEnd }}
+        ] }
       ]
     })
     return res.json({error: null, data: { events }})
 
   } catch (error) {
+    console.log('error: ', error)
     return res.status(500).json(error)
   }
 

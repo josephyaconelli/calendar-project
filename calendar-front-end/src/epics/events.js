@@ -12,7 +12,6 @@ const getEventsByMonthEpic = (action$, state$) => action$.pipe(
   ofType(types.GET_EVENTS_BY_MONTH),
   mergeMap(({ payload }) => 
     {
-      console.log('authoken: ', get(state$, 'value.user.authToken', ''))
       return axios.post(CONSTANTS.SERVER.GET_EVENTS_BY_MONTH, {
       month: payload.month,
       year: payload.year

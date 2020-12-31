@@ -33,8 +33,9 @@ export const Main = ({ getEventsByMonth, isLoggedIn, events }) => {
   const history = useHistory()
 
   useEffect(() => {
-    const month = value.getMonth()
-    const year = value.getFullYear()
+    const currDate = !!clickedMonth ? new Date(clickedMonth.activeStartDate) : value
+    const month = currDate.getMonth()
+    const year = currDate.getFullYear()
     getEventsByMonth(month, year)
   }, [clickedMonth, isLoggedIn, getEventsByMonth, value])
 
