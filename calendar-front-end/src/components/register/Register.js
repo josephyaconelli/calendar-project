@@ -3,6 +3,7 @@ import { Container, Button, Jumbotron, Form, FormControl, FormGroup, FormLabel }
 import { Link, useHistory } from 'react-router-dom'
 import axios from 'axios'
 import { setCookie } from '../../utils/utils'
+import CONSTANTS from '../../constants/constants'
 
 
 export const Register = ({setLoggedIn}) => {
@@ -16,7 +17,7 @@ export const Register = ({setLoggedIn}) => {
 
 
   const tryRegister = (name, email, password) => {
-    axios.post('http://localhost:5000/auth/register', {
+    axios.post(CONSTANTS.SERVER.REGISTER, {
       email,
       password,
       name

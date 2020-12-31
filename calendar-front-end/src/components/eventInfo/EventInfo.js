@@ -1,9 +1,7 @@
 import React from 'react'
 import {Card, Button} from 'react-bootstrap'
 import { Link, useHistory} from 'react-router-dom'
-
-
-
+import { BASE_URL } from '../../constants/constants'
 
 
 const createTimeString = (start, end) => {
@@ -56,7 +54,7 @@ export const EventInfo = ({
           {restOfIt["public"] && (
             <>
               <hr/>
-              <a href={`http://localhost:5000/share/${_id}`} target="_blank">{`http://localhost:5000/share/${_id}`}</a>
+              <a href={`${BASE_URL}/share/${_id}`} target="_blank">{`${BASE_URL}/share/${_id}`}</a>
             </>
           )}
           

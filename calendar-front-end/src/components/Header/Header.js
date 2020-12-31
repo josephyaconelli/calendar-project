@@ -14,15 +14,20 @@ export const Header = ({ isLoggedIn, logOut }) => {
     <Container>
       <Navbar variant="light">
         <Nav className="mr-auto">
-          <Link to="/edit"><Button variant="outline-info">+ Create Event</Button></Link>
+          {isLoggedIn && <Link to="/edit"><Button variant="outline-info">+ Create Event</Button></Link>}
         </Nav>
-        <Form inline className="mr-auto" onSubmit={(e) => {
-          e.preventDefault()
-          history.push(`/search?q=${searchText}`)
-          }}>
-          <FormControl type="text" placeholder="Search" className="mr-sm-2" value={searchText} onChange={e => setSearchText(e.target.value)} />
-          <Button variant="outline-info" type="submit">Search</Button>
-        </Form>
+        { isLoggedIn &&
+          (
+            <Form inline className="mr-auto" onSubmit={(e) => {
+              e.preventDefault()
+              history.push(`/search?q=${searchText}`)
+              }}>
+              <FormControl type="text" placeholder="Search" className="mr-sm-2" value={searchText} onChange={e => setSearchText(e.target.value)} />
+              <Button variant="outline-info" type="submit">Search</Button>
+            </Form>
+          )
+        }
+        
         <Nav >
         { !isLoggedIn ? (
           <Link to="/login"><Button variant="outline-info">Log In</Button></Link>
